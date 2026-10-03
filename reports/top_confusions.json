@@ -1,0 +1,77 @@
+[
+  {
+    "actual": "Política",
+    "predicted": "Economia",
+    "count": 112
+  },
+  {
+    "actual": "Economia",
+    "predicted": "Política",
+    "count": 89
+  },
+  {
+    "actual": "Tecnologia",
+    "predicted": "Economia",
+    "count": 62
+  },
+  {
+    "actual": "Economia",
+    "predicted": "Tecnologia",
+    "count": 57
+  },
+  {
+    "actual": "Mundo",
+    "predicted": "Economia",
+    "count": 42
+  },
+  {
+    "actual": "Economia",
+    "predicted": "Mundo",
+    "count": 39
+  },
+  {
+    "actual": "Política",
+    "predicted": "Mundo",
+    "count": 33
+  },
+  {
+    "actual": "Entretenimento",
+    "predicted": "Mundo",
+    "count": 30
+  },
+  {
+    "actual": "Mundo",
+    "predicted": "Entretenimento",
+    "count": 29
+  },
+  {
+    "actual": "Política",
+    "predicted": "Entretenimento",
+    "count": 21
+  },
+  {
+    "actual": "Mundo",
+    "predicted": "Política",
+    "count": 20
+  },
+  {
+    "actual": "Entretenimento",
+    "predicted": "Economia",
+    "count": 19
+  },
+  {
+    "actual": "Ciência",
+    "predicted": "Saúde",
+    "count": 17
+  },
+  {
+    "actual": "Tecnologia",
+    "predicted": "Entretenimento",
+    "count": 16
+  },
+  {
+    "actual": "Economia",
+    "predicted": "Entretenimento",
+    "count": 14
+  }
+]

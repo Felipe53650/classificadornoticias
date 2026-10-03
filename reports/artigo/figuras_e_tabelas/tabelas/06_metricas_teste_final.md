@@ -1,0 +1,13 @@
+| Métrica | Valor |
+| --- | --- |
+| accuracy | 0.9432 |
+| inference_ms_mean | 7.6108 |
+| batch_inference_ms_per_sample | 1.6312 |
+| precision_macro | 0.9049 |
+| recall_macro | 0.8869 |
+| f1_macro | 0.8955 |
+| precision_weighted | 0.9429 |
+| recall_weighted | 0.9432 |
+| f1_weighted | 0.9430 |
+| log_loss | 0.1806 |
+| brier_multiclass | 0.0864 |

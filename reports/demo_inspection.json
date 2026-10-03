@@ -1,0 +1,33 @@
+{
+  "file": "data\\raw\\demo.csv",
+  "columns": [
+    "title",
+    "text",
+    "category"
+  ],
+  "total_rows": 450,
+  "exact_duplicate_rows": 0,
+  "empty_by_column": {
+    "title": 0,
+    "text": 0,
+    "category": 0
+  },
+  "selected_columns": {
+    "title": "title",
+    "content": "text",
+    "category": "category"
+  },
+  "category_counts": {
+    "Política": 45,
+    "Economia": 45,
+    "Esportes": 45,
+    "Mundo": 45,
+    "Tecnologia": 45,
+    "Ciência": 45,
+    "Saúde": 45,
+    "Educação": 45,
+    "Entretenimento": 45,
+    "Turismo": 45
+  },
+  "empty_text_rows": 0
+}

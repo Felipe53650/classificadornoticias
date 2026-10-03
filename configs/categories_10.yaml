@@ -1,0 +1,93 @@
+scenario: categories_10
+dataset_version: brazilian-news-parquet-local-v1
+mapping_confirmed: true
+demo: false
+random_state: 42
+columns:
+  title: title
+  content: text
+  category: category
+categories:
+- Política
+- Economia
+- Esportes
+- Mundo
+- Tecnologia
+- Ciência
+- Saúde
+- Educação
+- Entretenimento
+- Turismo
+label_mapping:
+  poder: Política
+  colunas: null
+  mercado: Economia
+  esporte: Esportes
+  mundo: Mundo
+  cotidiano: null
+  ilustrada: Entretenimento
+  opiniao: null
+  paineldoleitor: null
+  saopaulo: null
+  tec: Tecnologia
+  tv: null
+  educacao: Educação
+  turismo: Turismo
+  ilustrissima: null
+  ciencia: Ciência
+  equilibrioesaude: Saúde
+  sobretudo: null
+  bbc: null
+  folhinha: null
+  empreendedorsocial: null
+  comida: null
+  asmais: null
+  ambiente: null
+  seminariosfolha: null
+  serafina: null
+  o-melhor-de-sao-paulo: null
+  vice: null
+  guia-de-livros-discos-filmes: null
+  topofmind: null
+  banco-de-dados: null
+  dw: null
+  especial: null
+  cenarios-2017: null
+  infograficos: null
+  rfi: null
+  guia-de-livros-filmes-discos: null
+  multimidia: null
+  treinamento: null
+  treinamentocienciaesaude: null
+  mulher: null
+  euronews: null
+  ombudsman: null
+  contas-de-casa: null
+  musica: null
+  '2016': null
+  bichos: null
+  '2015': null
+min_samples_per_class: 20
+split:
+  train: 0.7
+  validation: 0.15
+  test: 0.15
+tfidf:
+  lowercase: true
+  strip_accents: null
+  ngram_range:
+  - 1
+  - 2
+  min_df: 2
+  max_df: 0.95
+  max_features: 50000
+  sublinear_tf: true
+  dtype: float32
+models:
+- naive_bayes
+- logistic_regression
+- linear_svm
+- random_forest
+forest_trees: 50
+forest_max_depth: 30
+n_jobs: 2

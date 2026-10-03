@@ -1,0 +1,21 @@
+{
+  "python": "3.14.3",
+  "pandas": "3.0.6",
+  "numpy": "2.5.3",
+  "matplotlib": "3.11.2",
+  "source_created_at": "2026-10-03T02:19:21.496614+00:00",
+  "runs": [
+    {
+      "id": "categories_4_4ccab99fc5",
+      "dataset_sha256": "de4907dc2c2a45c0deea9a5890829caa90befec57f3bb8631cc6685afb4c6c3b"
+    },
+    {
+      "id": "categories_7_0c23d8a19c",
+      "dataset_sha256": "de4907dc2c2a45c0deea9a5890829caa90befec57f3bb8631cc6685afb4c6c3b"
+    },
+    {
+      "id": "categories_10_0f696b44c6",
+      "dataset_sha256": "de4907dc2c2a45c0deea9a5890829caa90befec57f3bb8631cc6685afb4c6c3b"
+    }
+  ]
+}

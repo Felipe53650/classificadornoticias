@@ -1,0 +1,22 @@
+﻿scenario,model,class_weight,train_seconds,inference_ms_mean,batch_inference_ms_per_sample,Ressalva
+categories_4,naive_bayes,none,84.48351620000903,2.547154000203591,0.7069824241932549,Treino usa cache de TF-IDF; custo integral não comparável
+categories_4,logistic_regression,none,13.424552999989828,1.7239460014388897,0.7837420683331383,Treino usa cache de TF-IDF; custo integral não comparável
+categories_4,logistic_regression,balanced,17.366745599982096,1.6814309975598007,0.669999214769781,Treino usa cache de TF-IDF; custo integral não comparável
+categories_4,linear_svm,none,15.630135200015502,1.6803580007399432,0.6540752819303768,Treino usa cache de TF-IDF; custo integral não comparável
+categories_4,linear_svm,balanced,13.036113400012256,1.6599460013094358,0.664004151699439,Treino usa cache de TF-IDF; custo integral não comparável
+categories_4,random_forest,none,31.53115190000972,16.679149999690708,0.7397450087709676,Treino usa cache de TF-IDF; custo integral não comparável
+categories_4,random_forest,balanced,26.81539740000153,15.779507002735045,0.7394341575457545,Treino usa cache de TF-IDF; custo integral não comparável
+categories_7,naive_bayes,none,79.83101930000703,3.363244998909068,0.696147540725019,Treino usa cache de TF-IDF; custo integral não comparável
+categories_7,logistic_regression,none,33.45751520001795,3.490572000737302,0.9508281419693112,Treino usa cache de TF-IDF; custo integral não comparável
+categories_7,logistic_regression,balanced,37.04619470000034,1.474512999993749,0.5995931218990345,Treino usa cache de TF-IDF; custo integral não comparável
+categories_7,linear_svm,none,18.61101360002067,1.4504449995001778,0.6163174077277032,Treino usa cache de TF-IDF; custo integral não comparável
+categories_7,linear_svm,balanced,21.75391629998921,1.4543589972890911,0.5969925316758944,Treino usa cache de TF-IDF; custo integral não comparável
+categories_7,random_forest,none,26.15070779999951,15.002131997898688,0.6381011411036521,Treino usa cache de TF-IDF; custo integral não comparável
+categories_7,random_forest,balanced,23.77127140000812,14.978654998994898,0.6551058156925164,Treino usa cache de TF-IDF; custo integral não comparável
+categories_10,naive_bayes,none,104.95510000002103,4.057175000198185,0.7159131054302302,Treino usa cache de TF-IDF; custo integral não comparável
+categories_10,logistic_regression,none,56.92294889999903,1.5992639985051935,0.7059325239607713,Treino usa cache de TF-IDF; custo integral não comparável
+categories_10,logistic_regression,balanced,47.20116070000222,2.257486996531952,0.7188869520765953,Treino usa cache de TF-IDF; custo integral não comparável
+categories_10,linear_svm,none,33.05825939998613,1.60536600073101,0.6432740127789779,Treino usa cache de TF-IDF; custo integral não comparável
+categories_10,linear_svm,balanced,34.758202800003346,1.6131110017886383,0.625568408944522,Treino usa cache de TF-IDF; custo integral não comparável
+categories_10,random_forest,none,33.65837719998672,15.043146998796146,0.64005132268418,Treino usa cache de TF-IDF; custo integral não comparável
+categories_10,random_forest,balanced,27.865897399984533,15.115918002848048,0.695016396166117,Treino usa cache de TF-IDF; custo integral não comparável

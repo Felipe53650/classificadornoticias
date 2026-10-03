@@ -1,0 +1,10 @@
+{
+  "demo": false,
+  "runs": [
+    "reports\\runs\\categories_4_4ccab99fc5",
+    "reports\\runs\\categories_7_0c23d8a19c",
+    "reports\\runs\\categories_10_0f696b44c6"
+  ],
+  "status": "complete",
+  "model_dir": "models/production"
+}

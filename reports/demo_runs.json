@@ -1,0 +1,9 @@
+{
+  "demo": true,
+  "runs": [
+    "reports\\runs\\categories_4_f90d917092",
+    "reports\\runs\\categories_7_5065d3852c",
+    "reports\\runs\\categories_10_0605b90909"
+  ],
+  "model_dir": "models/demo"
+}

@@ -1,0 +1,4 @@
+scenario,model,class_weight,f1_macro,accuracy,train_samples,validation_samples,test_samples
+categories_4,linear_svm,none,0.966186752273964,0.965583493442486,55860,11971,11972
+categories_7,linear_svm,balanced,0.8974676326231565,0.9496340599669474,59289,12707,12708
+categories_10,linear_svm,balanced,0.8905721948648132,0.9419169329073482,73027,15650,15654

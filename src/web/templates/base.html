@@ -1,0 +1,8 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Pauta · Assistente editorial</title><link rel="stylesheet" href="/static/css/app.css"><script src="/static/js/app.js" defer></script></head>
+<body data-page="{{ page }}">
+<header><a class="brand" href="/"><span class="brand-icon">P</span> pauta<span class="brand-dot">.</span></a><nav aria-label="Navegação principal"><a href="/" {% if page == 'editor' %}aria-current="page"{% endif %}>Mesa editorial</a><a href="/history" {% if page == 'history' %}aria-current="page"{% endif %}>Histórico</a></nav><span class="local-label">LABORATÓRIO EDITORIAL</span></header>
+<main><div id="model-status" class="notice" role="status">Verificando disponibilidade do modelo…</div>{% block content %}{% endblock %}<p id="message" role="status" aria-live="polite"></p></main>
+<footer><span>PAUTA / Classificação de notícias em português</span><span>A decisão final é sempre humana.</span></footer>
+</body></html>

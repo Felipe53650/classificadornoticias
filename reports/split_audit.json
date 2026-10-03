@@ -1,0 +1,32 @@
+[
+  {
+    "run": "reports\\runs\\categories_4_4ccab99fc5",
+    "disjoint": true,
+    "shared_classes_consistent": true,
+    "counts": {
+      "train": 55860,
+      "validation": 11971,
+      "test": 11972
+    }
+  },
+  {
+    "run": "reports\\runs\\categories_7_0c23d8a19c",
+    "disjoint": true,
+    "shared_classes_consistent": true,
+    "counts": {
+      "train": 59289,
+      "validation": 12707,
+      "test": 12708
+    }
+  },
+  {
+    "run": "reports\\runs\\categories_10_0f696b44c6",
+    "disjoint": true,
+    "shared_classes_consistent": true,
+    "counts": {
+      "train": 73027,
+      "validation": 15650,
+      "test": 15654
+    }
+  }
+]
