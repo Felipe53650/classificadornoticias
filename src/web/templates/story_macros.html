@@ -1,0 +1,21 @@
+{% macro illustration(story) %}
+<div class="story-art art-{{ story.theme }}" aria-hidden="true">
+  <span class="art-orbit"></span><span class="art-block block-one"></span><span class="art-block block-two"></span><span class="art-block block-three"></span><span class="art-ground"></span>
+  <span class="art-caption">PAUTA / {{ story.category | upper }}</span>
+</div>
+{% endmacro %}
+{% macro metadata(story) %}
+<div class="story-meta"><span>{{ 'Exemplo fictício' if story.example else 'Redação local · ' ~ story.date }}</span><span>{{ story.minutes }} min de leitura</span></div>
+{% endmacro %}
+{% macro card(story, featured=false) %}
+<article class="story-card{% if featured %} featured-story{% endif %}">
+  <a class="story-link" href="/news/{{ story.key }}">
+    {{ illustration(story) }}
+    <div class="story-copy"><span class="story-category">{{ story.category }}</span>
+      <h2>{{ story.title }}</h2><p class="story-summary">{{ story.summary }}</p>
+      {{ metadata(story) }}
+      {% if featured %}<span class="read-story">Ler matéria <span aria-hidden="true">↗</span></span>{% endif %}
+    </div>
+  </a>
+</article>
+{% endmacro %}

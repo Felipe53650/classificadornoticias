@@ -1,0 +1,15 @@
+.history-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.history-actions .button, .history-actions button { padding: 9px 12px; font-size: 12px; }
+.danger-outline { color: #9b382b; background: #fff5f1; border: 1px solid #edc9bf; }
+.danger-outline:hover { background: #fae4dc; }
+.danger { background: #a33b2d; }
+.danger:hover { background: #802d22; }
+#delete-dialog { width: min(520px, calc(100% - 32px)); max-height: calc(100dvh - 40px); overflow: auto; padding: 30px; border: 1px solid var(--line); border-radius: 14px; color: var(--ink); background: #fff; box-shadow: 0 24px 90px #20322e40; }
+#delete-dialog::backdrop { background: #1a2c2770; }
+#delete-heading { font: 30px/1.2 Georgia, serif; }
+#delete-title { font-weight: 600; overflow-wrap: anywhere; line-height: 1.6; max-height: 160px; overflow: auto; }
+#delete-description { color: #58655e; font-size: 14px; line-height: 1.7; }
+#delete-error { color: #a33827; font-size: 13px; line-height: 1.6; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
+#history-body td:first-child { max-width: 360px; overflow-wrap: anywhere; }
+@media(max-width:500px) { #delete-dialog { padding: 22px; } .dialog-actions { flex-direction: column-reverse; } }

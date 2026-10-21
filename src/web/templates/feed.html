@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% from 'story_macros.html' import card %}
+{% block content %}
+<section class="feed-intro" aria-labelledby="feed-title">
+  <div><p class="eyebrow">INFORMAÇÃO PARA EXPLORAR. HISTÓRIAS PARA CONECTAR.</p><h1 id="feed-title">Seu próximo assunto<br>começa <em>aqui.</em></h1><p class="subtitle">Novas perspectivas sobre o mundo ao seu redor.</p></div>
+  <form class="feed-search" action="/" method="get" role="search">
+    <label for="news-search">Encontre a sua próxima leitura</label>
+    <div class="search-row"><input id="news-search" name="q" value="{{ q }}" maxlength="200" placeholder="Busque um assunto…" type="search"><button type="submit" aria-label="Buscar notícias">Buscar <span aria-hidden="true">↗</span></button></div>
+    <input type="hidden" name="category" value="{{ category }}"><input type="hidden" name="source" value="{{ source }}">
+  </form>
+</section>
+<nav class="category-nav" aria-label="Filtrar por editoria">
+  <a href="{{ feed_url(category='') }}" {% if not category %}aria-current="true"{% endif %}>Todas</a>
+  {% for name in categories %}<a href="{{ feed_url(category=name) }}" {% if category == name %}aria-current="true"{% endif %}>{{ name }}</a>{% endfor %}
+</nav>
+<div class="feed-notice"><span class="notice-dot" aria-hidden="true"></span><p><strong>Uma experiência de leitura em demonstração.</strong> Exemplos fictícios e notícias salvas pela redação neste ambiente local.</p></div>
+<section aria-labelledby="stories-heading">
+  <div class="feed-section-heading">
+    <div><p class="eyebrow">{{ 'EXPLORE OS RESULTADOS' if q or category else 'NA SUA PAUTA' }}</p><h2 id="stories-heading">{{ 'Busca: “' ~ q ~ '”' if q else category or 'Histórias para descobrir' }}</h2></div>
+    <div class="source-switch" aria-label="Filtrar origem">
+      {% for value, label in [('all', 'Tudo'), ('editorial', 'Da redação'), ('demo', 'Exemplos')] %}<a href="{{ feed_url(source=value) }}" {% if source == value %}aria-current="true"{% endif %}>{{ label }}</a>{% endfor %}
+    </div>
+  </div>
+  <p class="result-count">{{ total }} {{ 'matéria encontrada' if total == 1 else 'matérias encontradas' }}{% if q or category or source != 'all' %} · <a href="/">Limpar filtros</a>{% endif %}</p>
+  {% if stories %}
+    <div class="news-grid">{% for story in stories %}{{ card(story, featured=loop.first and current_page == 1 and not q) }}{% endfor %}</div>
+    {% if pages > 1 %}<nav class="feed-pagination" aria-label="Páginas de notícias">
+      {% if current_page > 1 %}<a class="button secondary" href="{{ feed_url(p=current_page - 1) }}">← Anteriores</a>{% endif %}
+      <span>Página {{ current_page }} de {{ pages }}</span>
+      {% if current_page < pages %}<a class="button secondary" href="{{ feed_url(p=current_page + 1) }}">Próximas →</a>{% endif %}
+    </nav>{% endif %}
+  {% else %}<div class="feed-empty"><span class="empty-symbol" aria-hidden="true">≋</span><h3>Nenhuma matéria por aqui ainda.</h3><p>Experimente outro assunto ou explore todas as editorias.</p><a class="button" href="/">Ver todas as notícias</a>{% if source == 'editorial' %}<a class="empty-editor-link" href="/editor">Criar uma notícia na mesa editorial ↗</a>{% endif %}</div>{% endif %}
+</section>
+<aside class="editor-invite"><div><p class="eyebrow">DO TEXTO À EDITORIA</p><h2>Tem uma história para contar?</h2><p>Prepare sua notícia, revise a sugestão de categoria e dê a palavra final.</p></div><a class="button" href="/editor">Ir para a mesa editorial ↗</a></aside>
+{% endblock %}

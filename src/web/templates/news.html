@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% from 'story_macros.html' import illustration, metadata %}
+{% block title %}{{ story.title }} · Pauta{% endblock %}
+{% block content %}
+<div class="reading-nav"><a href="/">← Voltar ao feed</a><a href="{{ category_url }}">Mais em {{ story.category }} ↗</a></div>
+<article class="reading-story">
+  <div class="reading-heading"><p class="eyebrow">{{ story.category }}</p><h1>{{ story.title }}</h1>{{ metadata(story) }}</div>
+  {{ illustration(story) }}
+  <div class="reading-body">
+    <p class="reading-notice">{% if story.example %}<strong>Conteúdo fictício.</strong> Esta matéria foi criada para demonstrar a navegação do Pauta. Não relata acontecimentos reais.{% else %}<strong>Notícia da redação local.</strong> Texto e categoria confirmados no fluxo editorial deste protótipo; sem publicação externa ou verificação factual automática.{% endif %}</p>
+    {% for paragraph in story.content.split('\n') %}{% if paragraph.strip() %}<p class="article-paragraph">{{ paragraph }}</p>{% endif %}{% endfor %}
+    {% if not story.content.strip() %}<p class="article-paragraph">Esta notícia foi salva apenas com o título.</p>{% endif %}
+    <a class="button secondary" href="{{ category_url }}">Continuar explorando {{ story.category }} →</a>
+  </div>
+</article>
+{% endblock %}

@@ -49,6 +49,32 @@ Microsoft Edge em modo headless; resolução desktop 1440 × 1050 e mobile 390 �
 
 O banco usado pelo teste é temporário, e o servidor de teste foi encerrado. Para abrir o portal normalmente, execute o comando do README; ele criará o banco editorial local.
 
+## Feed de notícias — atualização de 21/10/2026
+
+`python -m pytest -q`: **28 testes aprovados**, com dois avisos de depreciação das dependências de teste. A cobertura adicional verifica exemplos sem gravação no banco/feedback, busca, filtros, paginação entre notícias locais e exemplos, ausência de duplicação entre páginas, confirmação obrigatória antes da exibição, uso da categoria final, escape de HTML e respostas 404. O feed e a leitura também funcionam sem modelo carregado.
+
+```powershell
+python -m scripts.check_ui --model-dir models/production --screenshots docs/screenshots/feed
+```
+
+Verificação aprovada no Edge em desktop (1440 × 1050) e mobile (390 × 844): busca, filtro por editoria, paginação, leitura de exemplos, estado vazio, navegação à mesa editorial, análise, confirmação, correção, histórico, notícia confirmada no feed e invalidação após edição. Sem erros JavaScript ou rolagem horizontal global nas telas mobile verificadas. Banco temporário, sem modificar o banco do usuário ou os artefatos de pesquisa.
+
+Capturas: [feed desktop](screenshots/feed/feed-desktop.png), [feed mobile](screenshots/feed/feed-mobile.png) e [leitura](screenshots/feed/reading-desktop.png). Os registros anteriores de treinamento e validação permanecem válidos; não houve novo treinamento para esta interface.
+
+## Edição e remoção no histórico — 21/10/2026
+
+`python -m pytest -q`: **33 testes aprovados**, com os mesmos dois avisos de depreciação das dependências de teste. `node --check src/web/static/js/app.js` também passou.
+
+Verificados: atualização do texto pela nova análise, categoria final, confirmação obrigatória, rejeição de campos adulterados, análise já usada por outra notícia, conflitos de revisão, alteração de categoria sem modelo carregado, remoção sem modelo, atualização do feed e feedback, respostas 404 e persistência de edição/exclusão após reiniciar. A data de criação continua a mesma; a API serializa datas em UTC de forma consistente.
+
+```powershell
+python -m scripts.check_ui --model-dir models/production --screenshots docs/screenshots/history-management
+```
+
+Fluxo aprovado no Edge: cancelar uma edição sem alterar o registro; editar texto, analisar e confirmar; verificar a matéria atualizada no feed; cancelar a remoção por botão e Escape; confirmar a exclusão em mobile; remover a única linha da última página e retornar à anterior. Verificações feitas com banco temporário, sem editar/remover notícias do usuário. O fluxo anterior de criação e navegação também passou.
+
+Capturas: [ações no histórico](screenshots/history-management/history-actions-desktop.png), [edição](screenshots/history-management/edit-desktop.png) e [confirmação da remoção em mobile](screenshots/history-management/delete-mobile.png).
+
 ## Limites
 
 Uma execução com semente 42 não fornece intervalo de confiança. Quase duplicados, dependência temporal, outras fontes jornalísticas e conteúdos fora da taxonomia ainda precisam de avaliação específica. A calibração foi aplicada, mas probabilidades não são garantias de acerto. Nenhuma configuração foi ajustada com base no teste final.

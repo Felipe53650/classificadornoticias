@@ -2,7 +2,7 @@
 
 Pipeline experimental de classificação textual em português e portal editorial local. O modelo sugere uma categoria; o editor revisa e salva a decisão. Python, TF-IDF, scikit-learn, FastAPI, Jinja2 e SQLite.
 
-**Estado:** implementação concluída, com 21 testes automatizados aprovados e fluxo verificado em navegador desktop/mobile usando o modelo real. O dataset `brazilian-news.parquet` contém 167.053 registros e 48 rótulos, dos quais dez editorias foram mapeadas para as categorias do projeto. Foram executados 21 experimentos nos cenários 4/7/10 classes. A SVM balanceada e calibrada foi exportada para `models/production`: **F1 macro 0,8955 e accuracy 94,32% em 15.654 notícias do teste reservado**. A inferência individual média observada foi 7,61 ms.
+**Estado:** implementação concluída, com 33 testes automatizados aprovados e fluxo verificado em navegador desktop/mobile usando o modelo real. O dataset `brazilian-news.parquet` contém 167.053 registros e 48 rótulos, dos quais dez editorias foram mapeadas para as categorias do projeto. Foram executados 21 experimentos nos cenários 4/7/10 classes. A SVM balanceada e calibrada foi exportada para `models/production`: **F1 macro 0,8955 e accuracy 94,32% em 15.654 notícias do teste reservado**. A inferência individual média observada foi 7,61 ms.
 
 Consulte os [resultados e limites de interpretação](reports/RESULTADOS.md), o [registro de validação](docs/VALIDACAO.md) e a [captura do portal com o modelo real](docs/screenshots/production/analysis-desktop.png). As execuções são rastreadas em `reports/research_runs.json`; a demonstração sintética permanece separada.
 
@@ -83,20 +83,40 @@ Os cenários reais usam no máximo 50.000 atributos TF-IDF `float32`. A floresta
 
 ## Portal e API
 
-1. Escreva título e/ou conteúdo e clique em **Analisar notícia**.
+A página inicial (`/`) é o feed de leitura do Pauta, com matéria em destaque, cards ilustrados, busca no título/conteúdo, filtros por editoria e origem, paginação e página de leitura completa. O layout se adapta ao computador e ao celular e a navegação do feed funciona sem JavaScript.
+
+Oito textos fictícios, identificados como **Exemplo fictício**, permitem explorar o portal mesmo com o banco vazio ou sem modelo carregado. Esses exemplos ficam em `src/web/feed.py`: não são inseridos no banco, não vêm do dataset Folha e não entram no treinamento, nas métricas ou no feedback editorial. O filtro **Da redação** mostra somente os registros confirmados no banco local; **Exemplos** mostra somente as demonstrações.
+
+As notícias salvas pela redação aparecem antes dos exemplos, da mais recente para a mais antiga, usando a categoria **final confirmada**. Apenas analisar um texto não o inclui no feed. As ilustrações são composições decorativas em CSS, sem imagens externas. O indicador de leitura é uma estimativa de 200 palavras por minuto.
+
+1. Abra a **Mesa editorial** (`/editor`), escreva título e/ou conteúdo e clique em **Analisar notícia**.
 2. Revise a categoria sugerida, confiança e top 3.
 3. Escolha a categoria final e marque a confirmação.
-4. Clique em **Salvar decisão** e consulte o histórico.
+4. Clique em **Salvar decisão** e consulte o feed ou o histórico (`/history`).
 
-Editar o texto invalida a sugestão. Salvar não publica em site externo. O banco `editorial.db` é criado automaticamente e preserva artigos após reiniciar.
+Editar o texto invalida a sugestão. Salvar disponibiliza a matéria no feed deste protótipo local, sem publicar em site externo. O banco `editorial.db` é criado automaticamente e preserva artigos após reiniciar.
+
+No **Histórico**, cada notícia tem as ações **Editar** e **Remover**:
+
+- **Editar** abre a mesa editorial com o texto, a categoria final e a análise salva. Mudar título ou conteúdo exige uma nova análise e confirmação antes de **Salvar alterações**. Alterar somente a categoria reaproveita a análise existente e funciona mesmo sem o modelo carregado. **Cancelar edição** volta ao histórico sem modificar a notícia.
+- **Remover** abre uma confirmação com o título da notícia. Confirmar retira o registro do histórico e do feed; cancelar ou pressionar Escape mantém a notícia. A interface não oferece desfazer.
+- A edição mantém o identificador e a data de criação da notícia. O feed e o feedback editorial passam a refletir a decisão atual; as métricas dos experimentos do TCC não são alteradas. As análises persistidas permanecem no banco, mas não constituem um histórico completo de versões das decisões.
+- Se outra aba modificar a notícia, a operação retorna conflito e pede para reabrir a edição ou atualizar o histórico. A exclusão da última linha de uma página retorna automaticamente à página anterior disponível.
 
 | Endpoint | Função |
 |---|---|
+| `GET /` | Feed paginado; filtros `q`, `category`, `source` (`all`, `editorial`, `demo`) e página `p` |
+| `GET /news/{key}` | Leitura de matéria (`local-ID` ou `demo-slug`); 404 para chave inexistente |
+| `GET /editor` | Mesa de análise e confirmação editorial |
+| `GET /history` | Histórico das decisões editoriais |
 | `GET /health` | Disponibilidade e versão do modelo; `degraded` quando ausente |
 | `GET /api/categories` | Categorias e limiares da interface |
 | `POST /api/classify` | Sugestão com top 3 e identificador persistido da previsão |
 | `POST /api/articles` | Confirmação humana de uma previsão |
 | `GET /api/articles` | Histórico paginado; filtros `category`, `was_corrected` |
+| `GET /api/articles/{id}` | Texto, decisão, análise salva, categorias válidas e `revision` para edição |
+| `PUT /api/articles/{id}` | Atualiza a notícia a partir de uma análise persistida e confirmação humana |
+| `DELETE /api/articles/{id}` | Remove do histórico/feed após confirmação e conferência da revisão |
 | `GET /api/feedback` | Aceitação, correções e pares de categorias |
 
 Exemplos de payload:
@@ -109,7 +129,9 @@ Exemplos de payload:
 {"prediction_id": "IDENTIFICADOR_RETORNADO", "final_category": "Economia", "confirmed": true}
 ```
 
-A segunda requisição usa os dados da previsão armazenada no servidor; o cliente não define confiança, categoria prevista, versão ou indicador de correção. Uma previsão só pode ser salva uma vez. A API retorna 422 para entradas inválidas, 503 quando o modelo está indisponível, 404 para previsão desconhecida e 409 para duplicação.
+A segunda requisição usa os dados da previsão armazenada no servidor; o cliente não define confiança, categoria prevista, versão ou indicador de correção. Uma previsão só pode estar vinculada a uma notícia por vez. A API retorna 422 para entradas inválidas, 503 quando o modelo está indisponível, 404 para notícia/previsão desconhecida e 409 para duplicação ou conflito de edição.
+
+Para atualizar, envie ao `PUT` os campos de confirmação acima mais `expected_revision`, obtido no `GET` da notícia. Para remover, envie ao `DELETE` um corpo JSON com `confirmed: true` e `expected_revision`. O servidor valida a revisão antes de modificar o registro. Texto e metadados da edição são copiados da análise indicada por `prediction_id`; a API não aceita texto livre nesse endpoint.
 
 ## Configuração e arquitetura
 
@@ -135,7 +157,7 @@ python -m pip install playwright
 python -m scripts.check_ui --model-dir models/production --screenshots docs/screenshots/production
 ```
 
-Esse teste inicia e encerra seu próprio servidor, usa banco temporário e verifica análise, confirmação, correção, histórico, filtros, invalidação após editar texto e layout mobile. Capturas são salvas no diretório indicado. Playwright não é dependência do portal nem do pipeline de pesquisa.
+Esse teste inicia e encerra seu próprio servidor, usa banco temporário e verifica feed, busca, editorias, paginação, leitura, análise, confirmação, correção, histórico, filtros, invalidação após editar texto e layout mobile. Capturas são salvas no diretório indicado. Playwright não é dependência do portal nem do pipeline de pesquisa.
 
 Sem autenticação, publicação externa, coleta automática, retreinamento automático ou detecção de conteúdo fora das categorias. Uso previsto: demonstração local. Pesquisas com dados reais precisam avaliar quase duplicados, desbalanceamento, calibração, variabilidade e mudança temporal. Limiares da interface não são garantias de acerto.
 

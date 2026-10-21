@@ -1,18 +1,23 @@
 """Aplicação local editorial com confirmação humana obrigatória."""
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 import logging
+import hashlib
+import json
 import os
 from pathlib import Path
 from uuid import uuid4
+from urllib.parse import urlencode
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.exc import IntegrityError
-from src.api.schemas import ClassifyRequest, SaveArticleRequest
+from src.api.schemas import ClassifyRequest, DeleteArticleRequest, SaveArticleRequest, UpdateArticleRequest
 from src.db.database import create_database
 from src.db.models import Article, Prediction
 from src.ml.inference import NewsClassifier
+from src.web.feed import FeedSource, article_view, demo_stories, get_feed
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -105,9 +110,102 @@ def create_app(model_dir: str | None = None, database_url: str | None = None) ->
             return {"total": total, "corrections": corrections, "acceptance_rate": (total - corrections) / total if total else None,
                     "pairs": [{"predicted": a, "final": b, "count": n} for a, b, n in groups]}
 
+    @app.get("/api/articles/{article_id}")
+    def article_detail(article_id: int):
+        with app.state.sessions() as session:
+            article = session.get(Article, article_id)
+            if article is None:
+                raise HTTPException(404, "Notícia não encontrada. Atualize o histórico.")
+            prediction = session.get(Prediction, article.prediction_id)
+            return {**serialize_article(article), "categories": prediction.categories,
+                    "analysis": {"prediction_id": prediction.id,
+                                 "predicted_category": prediction.predicted_category,
+                                 "confidence": prediction.confidence, "top_k": prediction.top_k,
+                                 "model_version": prediction.model_version}}
+
+    @app.put("/api/articles/{article_id}")
+    def update_article(article_id: int, payload: UpdateArticleRequest):
+        if not payload.confirmed:
+            raise HTTPException(422, "Confirme a decisão editorial antes de salvar.")
+        with app.state.sessions() as session:
+            article = session.get(Article, article_id)
+            if article is None:
+                raise HTTPException(404, "Notícia não encontrada. Atualize o histórico.")
+            if serialize_article(article)["revision"] != payload.expected_revision:
+                raise HTTPException(409, "Esta notícia foi alterada. Reabra a edição pelo histórico.")
+            prediction = session.get(Prediction, payload.prediction_id)
+            if prediction is None:
+                raise HTTPException(404, "Previsão não encontrada. Analise a notícia novamente.")
+            if payload.final_category not in prediction.categories:
+                raise HTTPException(422, "Categoria final desconhecida.")
+            # Texto e metadados vêm da mesma análise persistida, nunca do cliente.
+            values = dict(prediction_id=prediction.id, title=prediction.title, content=prediction.content,
+                          predicted_category=prediction.predicted_category, predicted_confidence=prediction.confidence,
+                          final_category=payload.final_category,
+                          was_corrected=prediction.predicted_category != payload.final_category,
+                          model_version=prediction.model_version, demo=prediction.demo)
+            try:
+                result = session.execute(update(Article).where(
+                    Article.id == article_id, Article.prediction_id == article.prediction_id,
+                    Article.final_category == article.final_category).values(**values))
+                if result.rowcount != 1:
+                    raise HTTPException(409, "Esta notícia foi alterada. Reabra a edição pelo histórico.")
+                session.commit()
+            except IntegrityError:
+                session.rollback()
+                raise HTTPException(409, "Esta análise já está vinculada a outra notícia.") from None
+            session.refresh(article)
+            return serialize_article(article)
+
+    @app.delete("/api/articles/{article_id}")
+    def delete_article(article_id: int, payload: DeleteArticleRequest):
+        if not payload.confirmed:
+            raise HTTPException(422, "Confirme a remoção da notícia.")
+        with app.state.sessions() as session:
+            article = session.get(Article, article_id)
+            if article is None:
+                raise HTTPException(404, "Notícia não encontrada. Atualize o histórico.")
+            if serialize_article(article)["revision"] != payload.expected_revision:
+                raise HTTPException(409, "Esta notícia foi alterada. Atualize o histórico antes de remover.")
+            result = session.execute(delete(Article).where(
+                Article.id == article_id, Article.prediction_id == article.prediction_id,
+                Article.final_category == article.final_category))
+            if result.rowcount != 1:
+                raise HTTPException(409, "Esta notícia foi alterada. Atualize o histórico antes de remover.")
+            session.commit()
+            return {"deleted": True, "id": article_id}
+
     @app.get("/")
-    def index(request: Request):
-        return templates.TemplateResponse(request=request, name="index.html", context={"page": "editor"})
+    def index(request: Request, category: str = Query("", max_length=100),
+              q: str = Query("", max_length=200), source: FeedSource = "all", p: int = Query(1, ge=1)):
+        q = q.strip()
+        with app.state.sessions() as session:
+            feed = get_feed(session, category=category, q=q, source=source, page=p)
+
+        def feed_url(**changes):
+            params = {"category": category, "q": q, "source": source, **changes}
+            return "/?" + urlencode({key: value for key, value in params.items() if value != ""})
+
+        return templates.TemplateResponse(request=request, name="feed.html", context={
+            "page": "feed", **feed, "category": category, "q": q, "source": source, "feed_url": feed_url})
+
+    @app.get("/news/{key}")
+    def read_article(request: Request, key: str):
+        story = next((item for item in demo_stories() if item["key"] == key), None)
+        if key.startswith("local-") and key[6:].isascii() and key[6:].isdigit() and len(key[6:]) <= 18:
+            with app.state.sessions() as session:
+                article = session.get(Article, int(key[6:]))
+                if article:
+                    story = article_view(article)
+        if story is None:
+            return templates.TemplateResponse(request=request, name="news_missing.html",
+                                              context={"page": "feed"}, status_code=404)
+        return templates.TemplateResponse(request=request, name="news.html", context={
+            "page": "feed", "story": story, "category_url": "/?" + urlencode({"category": story["category"]})})
+
+    @app.get("/editor")
+    def editor(request: Request, article: int | None = Query(None, ge=1)):
+        return templates.TemplateResponse(request=request, name="index.html", context={"page": "editor", "editing": article})
 
     @app.get("/history")
     def history(request: Request):
@@ -117,7 +215,12 @@ def create_app(model_dir: str | None = None, database_url: str | None = None) ->
 
 
 def serialize_article(article: Article) -> dict:
-    return {c.name: getattr(article, c.name) for c in Article.__table__.columns}
+    data = {c.name: getattr(article, c.name) for c in Article.__table__.columns}
+    data = {key: (value.replace(tzinfo=value.tzinfo or timezone.utc)
+                  if isinstance(value, datetime) else value) for key, value in data.items()}
+    canonical = {key: (value.isoformat() if isinstance(value, datetime) else value) for key, value in data.items()}
+    data["revision"] = hashlib.sha256(json.dumps(canonical, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+    return data
 
 
 app = create_app()

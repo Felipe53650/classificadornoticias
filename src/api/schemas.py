@@ -18,3 +18,13 @@ class SaveArticleRequest(BaseModel):
     prediction_id: str = Field(min_length=1, max_length=36)
     final_category: str = Field(min_length=1, max_length=100)
     confirmed: bool
+
+
+class UpdateArticleRequest(SaveArticleRequest):
+    expected_revision: str = Field(pattern=r"^[a-f0-9]{64}$")
+
+
+class DeleteArticleRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    confirmed: bool
+    expected_revision: str = Field(pattern=r"^[a-f0-9]{64}$")

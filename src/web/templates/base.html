@@ -1,8 +1,29 @@
 <!doctype html>
 <html lang="pt-BR">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Pauta · Assistente editorial</title><link rel="stylesheet" href="/static/css/app.css"><script src="/static/js/app.js" defer></script></head>
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Pauta · {{ 'Seu próximo assunto' if page == 'feed' else 'Assistente editorial' }}{% endblock %}</title>
+  <link rel="stylesheet" href="/static/css/app.css">
+  <link rel="stylesheet" href="/static/css/feed.css">
+  {% if page == 'history' %}<link rel="stylesheet" href="/static/css/history.css">{% endif %}
+  {% if page in ['editor', 'history'] %}<script src="/static/js/app.js" defer></script>{% endif %}
+</head>
 <body data-page="{{ page }}">
-<header><a class="brand" href="/"><span class="brand-icon">P</span> pauta<span class="brand-dot">.</span></a><nav aria-label="Navegação principal"><a href="/" {% if page == 'editor' %}aria-current="page"{% endif %}>Mesa editorial</a><a href="/history" {% if page == 'history' %}aria-current="page"{% endif %}>Histórico</a></nav><span class="local-label">LABORATÓRIO EDITORIAL</span></header>
-<main><div id="model-status" class="notice" role="status">Verificando disponibilidade do modelo…</div>{% block content %}{% endblock %}<p id="message" role="status" aria-live="polite"></p></main>
-<footer><span>PAUTA / Classificação de notícias em português</span><span>A decisão final é sempre humana.</span></footer>
-</body></html>
+<a class="skip-link" href="#main">Pular para o conteúdo</a>
+<header>
+  <a class="brand" href="/" aria-label="Pauta, início"><span class="brand-icon">P</span> pauta<span class="brand-dot">.</span></a>
+  <nav aria-label="Navegação principal">
+    <a href="/" {% if page == 'feed' %}aria-current="page"{% endif %}>Início</a>
+    <a href="/editor" {% if page == 'editor' %}aria-current="page"{% endif %}>Mesa editorial</a>
+    <a href="/history" {% if page == 'history' %}aria-current="page"{% endif %}>Histórico</a>
+  </nav>
+  <span class="local-label">{{ 'UM NOVO OLHAR PARA CADA ASSUNTO' if page == 'feed' else 'LABORATÓRIO EDITORIAL' }}</span>
+</header>
+<main id="main">
+  {% if page in ['editor', 'history'] %}<div id="model-status" class="notice" role="status">Verificando disponibilidade do modelo…</div>{% endif %}
+  {% block content %}{% endblock %}
+  {% if page in ['editor', 'history'] %}<p id="message" role="status" aria-live="polite"></p>{% endif %}
+</main>
+<footer><span>PAUTA / Classificação de notícias em português</span><span>{{ 'Um portal experimental. Uma leitura de cada vez.' if page == 'feed' else 'A decisão final é sempre humana.' }}</span></footer>
+</body>
+</html>
